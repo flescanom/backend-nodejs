@@ -18,10 +18,17 @@ app.use( express.json() );
 dbConnection();
 
 // Rutas
+
+// TODO: Revisar ruta raiz 
+
 app.use( '/api/users', require('./routes/users') );
+app.use( '/api/hospitals', require('./routes/hospitals') );
+app.use( '/api/all', require('./routes/searchs') );
+app.use( '/api/doctors', require('./routes/doctors') );
+app.use( '/api/uploads', require('./routes/uploads') );
 app.use( '/api/login', require('./routes/auth') );
 
 
 app.listen( process.env.PORT, () => {
-    console.log('Servidor correindo en puerto ' + process.env.PORT);
+    console.log('Servidor corriendo en puerto ' + process.env.PORT);
 })

@@ -6,12 +6,21 @@ const { generateJWT } = require("../helpers/jwt");
 const User = require("../models/user");
 
 const getUsers = async (req, res) => {
-  const users = await User.find({}, "name email role google");
+  const from = Number(req.query.from) || 0;
+
+  const [users, total] = await Promise.all([
+    User
+      .find({}, "name email role google img")
+      .skip(from)
+      .limit(5),
+    await User.countDocuments()
+  ]);
 
   res.json({
     ok: true,
     users,
-    uid: req.uid
+    total,
+    uid_req: req.uid,
   });
 };
 
@@ -39,15 +48,15 @@ const createUser = async (req, res = response) => {
     await user.save();
 
     // Generar el token - JWT
-    const token = await generateJWT( user.id );
+    const token = await generateJWT(user.id);
 
     res.json({
       ok: true,
       user,
-      token
+      token,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({
       ok: false,
       msg: "Error inesperado... revisar logs",
@@ -113,11 +122,11 @@ const deleteUser = async (req, res = response) => {
       });
     }
 
-    await User.findByIdAndDelete( uid ); 
+    await User.findByIdAndDelete(uid);
 
     res.json({
       ok: true,
-      msg: 'Usuario eliminado'
+      msg: "Usuario eliminado",
     });
   } catch (error) {
     console.log(error);
